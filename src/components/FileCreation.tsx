@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import CustomInput from './ui/CustomInput';
 import CustomButton from './ui/CustomButton';
 import { Lock, FileText, Plus } from 'lucide-react';
-import { createFile } from '@/utils/localStorage';
+import { createFile } from '@/utils/supabaseUtils';
 import { toast } from 'sonner';
 
 interface FileCreationProps {
@@ -48,7 +48,7 @@ const FileCreation: React.FC<FileCreationProps> = ({ onFileCreated }) => {
 
     setIsLoading(true);
     try {
-      const newFile = createFile(fileName, password);
+      const newFile = await createFile(fileName, password);
       toast.success('File created successfully');
       onFileCreated(newFile.id);
       // Reset form

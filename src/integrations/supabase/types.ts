@@ -9,7 +9,62 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      file_images: {
+        Row: {
+          created_at: string | null
+          file_id: string | null
+          id: string
+          image_data: string
+        }
+        Insert: {
+          created_at?: string | null
+          file_id?: string | null
+          id?: string
+          image_data: string
+        }
+        Update: {
+          created_at?: string | null
+          file_id?: string | null
+          id?: string
+          image_data?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "file_images_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          name: string
+          password_hash: string
+          updated_at: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          password_hash: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          password_hash?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

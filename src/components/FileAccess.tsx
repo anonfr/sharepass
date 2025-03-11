@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import CustomInput from './ui/CustomInput';
 import CustomButton from './ui/CustomButton';
 import { Lock, File, LogIn } from 'lucide-react';
-import { authenticateFile } from '@/utils/localStorage';
+import { authenticateFile } from '@/utils/supabaseUtils';
 import { toast } from 'sonner';
 
 interface FileAccessProps {
@@ -44,7 +44,7 @@ const FileAccess: React.FC<FileAccessProps> = ({ onFileAccessed }) => {
 
     setIsLoading(true);
     try {
-      const file = authenticateFile(fileName, password);
+      const file = await authenticateFile(fileName, password);
       toast.success(`Welcome back to "${file.name}"`);
       onFileAccessed(file.id);
       // Reset form

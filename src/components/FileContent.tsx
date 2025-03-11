@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { getFileById, updateFile, deleteFile, FileData, FileContent } from '@/utils/localStorage';
+import { getFileById, updateFile, deleteFile, FileData, FileContent } from '@/utils/supabaseUtils';
 import CustomButton from './ui/CustomButton';
 import { Save, Trash2, RefreshCw, LogOut, Image, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -20,17 +20,23 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
 
   // Load file data
   useEffect(() => {
-    const loadFile = () => {
-      const fileData = getFileById(fileId);
-      if (!fileData) {
-        toast.error('File not found');
+    const loadFile = async () => {
+      try {
+        const fileData = await getFileById(fileId);
+        if (!fileData) {
+          toast.error('File not found');
+          onExit();
+          return;
+        }
+        
+        setFile(fileData);
+        setTextContent(fileData.content.text);
+        setImages(fileData.content.images);
+      } catch (error) {
+        console.error('Error loading file:', error);
+        toast.error('Failed to load file');
         onExit();
-        return;
       }
-      
-      setFile(fileData);
-      setTextContent(fileData.content.text);
-      setImages(fileData.content.images);
     };
     
     loadFile();
@@ -43,7 +49,7 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
     }
   }, [textContent, images]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!file) return;
     
     setIsLoading(true);
@@ -53,39 +59,46 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
         images: images
       };
       
-      const updatedFile = updateFile(file.id, updatedContent);
+      const updatedFile = await updateFile(file.id, updatedContent);
       setFile(updatedFile);
       toast.success('File saved successfully');
     } catch (error) {
+      console.error('Error saving file:', error);
       toast.error('Failed to save file');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     if (!file) return;
     
-    const refreshedFile = getFileById(file.id);
-    if (refreshedFile) {
-      setFile(refreshedFile);
-      setTextContent(refreshedFile.content.text);
-      setImages(refreshedFile.content.images);
-      toast.success('File refreshed');
-    } else {
+    try {
+      const refreshedFile = await getFileById(file.id);
+      if (refreshedFile) {
+        setFile(refreshedFile);
+        setTextContent(refreshedFile.content.text);
+        setImages(refreshedFile.content.images);
+        toast.success('File refreshed');
+      } else {
+        toast.error('Failed to refresh file');
+      }
+    } catch (error) {
+      console.error('Error refreshing file:', error);
       toast.error('Failed to refresh file');
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!file) return;
     
     if (window.confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
       try {
-        deleteFile(file.id);
+        await deleteFile(file.id);
         toast.success('File deleted successfully');
         onExit();
       } catch (error) {
+        console.error('Error deleting file:', error);
         toast.error('Failed to delete file');
       }
     }
@@ -110,18 +123,22 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
     }
     
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       if (event.target && typeof event.target.result === 'string') {
         const newImages = [...images, event.target.result];
         setImages(newImages);
         
         // Auto save when image is added
         if (file) {
-          const updatedContent: FileContent = {
-            text: textContent,
-            images: newImages
-          };
-          updateFile(file.id, updatedContent);
+          try {
+            const updatedContent: FileContent = {
+              text: textContent,
+              images: newImages
+            };
+            await updateFile(file.id, updatedContent);
+          } catch (error) {
+            console.error('Error auto-saving after image upload:', error);
+          }
         }
       }
     };
@@ -133,18 +150,22 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
     }
   };
 
-  const handleRemoveImage = (index: number) => {
+  const handleRemoveImage = async (index: number) => {
     const newImages = [...images];
     newImages.splice(index, 1);
     setImages(newImages);
     
     // Auto save when image is removed
     if (file) {
-      const updatedContent: FileContent = {
-        text: textContent,
-        images: newImages
-      };
-      updateFile(file.id, updatedContent);
+      try {
+        const updatedContent: FileContent = {
+          text: textContent,
+          images: newImages
+        };
+        await updateFile(file.id, updatedContent);
+      } catch (error) {
+        console.error('Error auto-saving after image removal:', error);
+      }
     }
   };
 
