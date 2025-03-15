@@ -1,6 +1,19 @@
-
-import { FileContent, FileData } from '@/utils/localStorage';
 import { supabase } from '@/integrations/supabase/client';
+import { createHash } from 'crypto';
+
+// Define types that were missing exports
+export interface FileContent {
+  text: string;
+  images: string[];
+}
+
+export interface FileData {
+  id: string;
+  name: string;
+  content: FileContent;
+  createdAt: number;
+  updatedAt: number;
+}
 
 // Simple hash function for passwords (for demo purposes only - not secure)
 export const hashPassword = (password: string): string => {

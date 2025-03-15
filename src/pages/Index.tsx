@@ -1,14 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileCreation from '@/components/FileCreation';
 import FileAccess from '@/components/FileAccess';
 import FileContent from '@/components/FileContent';
 import ThemeToggle from '@/components/ThemeToggle';
-import { LockKeyhole, Sparkles, KeyRound } from 'lucide-react';
+import { LockKeyhole, Sparkles, KeyRound, Lock } from 'lucide-react';
 
 const Index = () => {
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("create");
 
   const handleFileCreated = (fileId: string) => {
     setActiveFileId(fileId);
@@ -20,6 +21,10 @@ const Index = () => {
 
   const handleExit = () => {
     setActiveFileId(null);
+  };
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
   };
 
   return (
@@ -64,10 +69,25 @@ const Index = () => {
       <div className="flex-1 w-full px-4 pb-16 z-10">
         <div className="max-w-6xl mx-auto">
           {!activeFileId ? <>
-              <Tabs defaultValue="create" className="w-full max-w-md mx-auto">
+              <Tabs 
+                defaultValue="create" 
+                value={activeTab}
+                onValueChange={handleTabChange} 
+                className="w-full max-w-md mx-auto"
+              >
                 <TabsList className="grid w-full grid-cols-2 mb-8">
-                  <TabsTrigger value="create">Create File</TabsTrigger>
-                  <TabsTrigger value="access">Access File</TabsTrigger>
+                  <TabsTrigger value="create" className="relative">
+                    <div className="flex items-center gap-2">
+                      <Lock size={16} className={`transition-all duration-300 ${activeTab === "create" ? "text-primary" : "text-muted-foreground"}`} />
+                      <span>Create File</span>
+                    </div>
+                  </TabsTrigger>
+                  <TabsTrigger value="access" className="relative">
+                    <div className="flex items-center gap-2">
+                      <KeyRound size={16} className={`transition-all duration-300 ${activeTab === "access" ? "text-primary" : "text-muted-foreground"}`} />
+                      <span>Access File</span>
+                    </div>
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="create">
                   <FileCreation onFileCreated={handleFileCreated} />
