@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileCreation from '@/components/FileCreation';
 import FileAccess from '@/components/FileAccess';
 import FileContent from '@/components/FileContent';
+import ThemeToggle from '@/components/ThemeToggle';
 import { LockKeyhole, Sparkles, KeyRound } from 'lucide-react';
 
 const Index = () => {
@@ -23,6 +24,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col relative">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle />
+      </div>
+      
       {/* Decorative Lock on left side */}
       <div className="fixed left-8 top-1/2 -translate-y-1/2 hidden lg:block z-0 opacity-10">
         <LockKeyhole size={200} className="text-primary animate-pulse-slow" />
