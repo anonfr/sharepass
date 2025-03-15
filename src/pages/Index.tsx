@@ -1,23 +1,40 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileCreation from '@/components/FileCreation';
 import FileAccess from '@/components/FileAccess';
 import FileContent from '@/components/FileContent';
-import { LockKeyhole, Sparkles } from 'lucide-react';
+import { LockKeyhole, Sparkles, KeyRound } from 'lucide-react';
+
 const Index = () => {
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
+
   const handleFileCreated = (fileId: string) => {
     setActiveFileId(fileId);
   };
+
   const handleFileAccessed = (fileId: string) => {
     setActiveFileId(fileId);
   };
+
   const handleExit = () => {
     setActiveFileId(null);
   };
-  return <div className="min-h-screen flex flex-col">
+
+  return (
+    <div className="min-h-screen flex flex-col relative">
+      {/* Decorative Lock on left side */}
+      <div className="fixed left-8 top-1/2 -translate-y-1/2 hidden lg:block z-0 opacity-10">
+        <LockKeyhole size={200} className="text-primary animate-pulse-slow" />
+      </div>
+
+      {/* Decorative Key on right side */}
+      <div className="fixed right-8 top-1/2 -translate-y-1/2 hidden lg:block z-0 opacity-10">
+        <KeyRound size={200} className="text-primary animate-pulse-slow" />
+      </div>
+
       {/* Header/Hero section */}
-      <div className="w-full py-10 md:py-16 px-4">
+      <div className="w-full py-10 md:py-16 px-4 z-10">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-center mb-6">
             <div className="flex items-center gap-2 text-primary">
@@ -38,7 +55,7 @@ const Index = () => {
       </div>
       
       {/* Main content */}
-      <div className="flex-1 w-full px-4 pb-16">
+      <div className="flex-1 w-full px-4 pb-16 z-10">
         <div className="max-w-6xl mx-auto">
           {!activeFileId ? <>
               <Tabs defaultValue="create" className="w-full max-w-md mx-auto">
@@ -65,12 +82,13 @@ const Index = () => {
       </div>
       
       {/* Footer */}
-      <footer className="w-full py-6 border-t">
+      <footer className="w-full py-6 border-t z-10">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-muted-foreground">
           <p>Created by Dhammanand Gaikwad</p>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
 
 // Feature card component
@@ -89,4 +107,5 @@ const FeatureCard = ({
       <p className="text-muted-foreground">{description}</p>
     </div>;
 };
+
 export default Index;
