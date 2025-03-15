@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { getFileById, updateFile, deleteFile, FileData, FileContentType, uploadImage, getImagesByFileId } from '@/utils/supabaseUtils';
+import { getFileById, updateFile, deleteFile, FileData, FileContent } from '@/utils/supabaseUtils';
 import CustomButton from './ui/CustomButton';
 import { Save, Trash2, RefreshCw, LogOut, Image, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -30,26 +30,8 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
         }
         
         setFile(fileData);
-        
-        try {
-          // Try to parse content as JSON
-          const parsedContent = JSON.parse(fileData.content) as FileContentType;
-          setTextContent(parsedContent.text || '');
-          setImages(parsedContent.images || []);
-        } catch (parseError) {
-          // If parsing fails, treat content as plain text
-          setTextContent(fileData.content || '');
-          
-          // Also try to load images separately
-          try {
-            const imagesData = await getImagesByFileId(fileId);
-            if (imagesData && imagesData.length > 0) {
-              setImages(imagesData.map(img => img.image_data));
-            }
-          } catch (imgError) {
-            console.error('Error loading images:', imgError);
-          }
-        }
+        setTextContent(fileData.content.text);
+        setImages(fileData.content.images);
       } catch (error) {
         console.error('Error loading file:', error);
         toast.error('Failed to load file');
@@ -72,12 +54,13 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
     
     setIsLoading(true);
     try {
-      const updatedContent: FileContentType = {
+      const updatedContent: FileContent = {
         text: textContent,
         images: images
       };
       
-      await updateFile(file.id, updatedContent);
+      const updatedFile = await updateFile(file.id, updatedContent);
+      setFile(updatedFile);
       toast.success('File saved successfully');
     } catch (error) {
       console.error('Error saving file:', error);
@@ -94,18 +77,9 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
       const refreshedFile = await getFileById(file.id);
       if (refreshedFile) {
         setFile(refreshedFile);
-        
-        try {
-          // Try to parse content as JSON
-          const parsedContent = JSON.parse(refreshedFile.content) as FileContentType;
-          setTextContent(parsedContent.text || '');
-          setImages(parsedContent.images || []);
-          toast.success('File refreshed');
-        } catch (parseError) {
-          // If parsing fails, treat content as plain text
-          setTextContent(refreshedFile.content || '');
-          toast.success('File refreshed (content format is legacy)');
-        }
+        setTextContent(refreshedFile.content.text);
+        setImages(refreshedFile.content.images);
+        toast.success('File refreshed');
       } else {
         toast.error('Failed to refresh file');
       }
@@ -134,16 +108,16 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
     const files = e.target.files;
     if (!files || !files.length) return;
     
-    const selectedFile = files[0];
+    const file = files[0];
     
     // Check if file is an image
-    if (!selectedFile.type.startsWith('image/')) {
+    if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
       return;
     }
     
     // Check file size (max 5MB)
-    if (selectedFile.size > 5 * 1024 * 1024) {
+    if (file.size > 5 * 1024 * 1024) {
       toast.error('Image size exceeds 5MB limit');
       return;
     }
@@ -157,11 +131,7 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
         // Auto save when image is added
         if (file) {
           try {
-            // First save to file_images table
-            await uploadImage(file.id, event.target.result);
-            
-            // Then update the main file content
-            const updatedContent: FileContentType = {
+            const updatedContent: FileContent = {
               text: textContent,
               images: newImages
             };
@@ -172,7 +142,7 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
         }
       }
     };
-    reader.readAsDataURL(selectedFile);
+    reader.readAsDataURL(file);
     
     // Reset the input
     if (fileInputRef.current) {
@@ -188,7 +158,7 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
     // Auto save when image is removed
     if (file) {
       try {
-        const updatedContent: FileContentType = {
+        const updatedContent: FileContent = {
           text: textContent,
           images: newImages
         };
@@ -199,8 +169,8 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleString();
   };
 
   if (!file) {
@@ -219,7 +189,7 @@ const FileContent: React.FC<FileContentProps> = ({ fileId, onExit }) => {
           <div>
             <h2 className="text-2xl font-medium mb-1">{file.name}</h2>
             <p className="text-xs text-muted-foreground">
-              Created: {formatDate(file.created_at)} • Last updated: {formatDate(file.updated_at)}
+              Created: {formatDate(file.createdAt)} • Last updated: {formatDate(file.updatedAt)}
             </p>
           </div>
           

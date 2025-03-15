@@ -1,116 +1,107 @@
 
 import React, { useState } from 'react';
-import { z } from 'zod';
-import { authenticateFile } from '@/utils/supabaseUtils';
 import CustomInput from './ui/CustomInput';
 import CustomButton from './ui/CustomButton';
-import { File, Key } from 'lucide-react';
+import { Lock, File, LogIn } from 'lucide-react';
+import { authenticateFile } from '@/utils/supabaseUtils';
 import { toast } from 'sonner';
 
 interface FileAccessProps {
   onFileAccessed: (fileId: string) => void;
 }
 
-const accessSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  password: z.string().min(1, 'Password is required'),
-});
-
 const FileAccess: React.FC<FileAccessProps> = ({ onFileAccessed }) => {
-  const [name, setName] = useState('');
+  const [fileName, setFileName] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ name?: string; password?: string }>({});
-  
+  const [errors, setErrors] = useState({
+    fileName: '',
+    password: ''
+  });
+
+  const validate = (): boolean => {
+    const newErrors = {
+      fileName: '',
+      password: ''
+    };
+
+    if (!fileName.trim()) {
+      newErrors.fileName = 'File name is required';
+    }
+
+    if (!password.trim()) {
+      newErrors.password = 'Password is required';
+    }
+
+    setErrors(newErrors);
+    return !newErrors.fileName && !newErrors.password;
+  };
+
   const handleAccessFile = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate form
-    try {
-      accessSchema.parse({ name, password });
-      setErrors({});
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const formattedErrors: { [key: string]: string } = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            formattedErrors[err.path[0] as string] = err.message;
-          }
-        });
-        setErrors(formattedErrors);
-        return;
-      }
-    }
-    
+
+    if (!validate()) return;
+
     setIsLoading(true);
-    
     try {
-      const file = await authenticateFile(name, password);
-      toast.success(`Access granted to "${name}"`);
+      const file = await authenticateFile(fileName, password);
+      toast.success(`Welcome back to "${file.name}"`);
       onFileAccessed(file.id);
+      // Reset form
+      setFileName('');
+      setPassword('');
     } catch (error) {
-      console.error('Error accessing file:', error);
-      
-      let errorMessage = 'Failed to access file';
-      let errorField: 'name' | 'password' = 'name';
-      
       if (error instanceof Error) {
-        if (error.message.includes('not found')) {
-          errorMessage = 'File not found';
-          errorField = 'name';
-        } else if (error.message.includes('password')) {
-          errorMessage = 'Incorrect password';
-          errorField = 'password';
-        }
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to access file');
       }
-      
-      setErrors({ [errorField]: errorMessage });
-      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
-    <div className="glass-panel p-6 rounded-xl animate-fade-in">
-      <form onSubmit={handleAccessFile} className="space-y-6">
-        <div className="space-y-4">
+    <div className="w-full max-w-md mx-auto animate-scale-in">
+      <div className="glass-panel p-6 rounded-xl">
+        <h2 className="text-2xl font-medium mb-6 flex items-center gap-2">
+          <LogIn size={20} className="text-primary" />
+          Access Existing File
+        </h2>
+        
+        <form onSubmit={handleAccessFile} className="space-y-4">
           <CustomInput
             label="File Name"
-            id="name"
-            value={name}
-            onChange={setName}
             placeholder="Enter the file name"
-            icon={<File size={18} />}
-            error={errors.name}
-            disabled={isLoading}
-            required
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            icon={<File size={16} />}
+            error={errors.fileName}
+            autoFocus
           />
           
           <CustomInput
             label="Password"
-            id="password"
-            value={password}
-            onChange={setPassword}
-            placeholder="Enter the file password"
             type="password"
-            icon={<Key size={18} />}
+            placeholder="Enter the file password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            icon={<Lock size={16} />}
             error={errors.password}
-            disabled={isLoading}
-            required
           />
-        </div>
-        
-        <div className="pt-2">
-          <CustomButton 
-            type="submit" 
-            className="w-full"
-            isLoading={isLoading}
-          >
-            Access File
-          </CustomButton>
-        </div>
-      </form>
+          
+          <div className="pt-2">
+            <CustomButton
+              type="submit"
+              className="w-full"
+              isLoading={isLoading}
+              size="lg"
+            >
+              Access File
+            </CustomButton>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
