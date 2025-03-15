@@ -5,7 +5,7 @@ import FileCreation from '@/components/FileCreation';
 import FileAccess from '@/components/FileAccess';
 import FileContent from '@/components/FileContent';
 import ThemeToggle from '@/components/ThemeToggle';
-import { Heart, Sparkles, Gift, Wand } from 'lucide-react';
+import { LockKeyhole, Sparkles, KeyRound } from 'lucide-react';
 
 const Index = () => {
   const [activeFileId, setActiveFileId] = useState<string | null>(null);
@@ -29,14 +29,14 @@ const Index = () => {
         <ThemeToggle />
       </div>
       
-      {/* Decorative Heart on left side */}
+      {/* Decorative Lock on left side */}
       <div className="fixed left-8 top-1/2 -translate-y-1/2 hidden lg:block z-0 opacity-10">
-        <Heart size={200} className="text-pink-400 dark:text-pink-500 animate-pulse-slow" />
+        <LockKeyhole size={200} className="text-primary animate-pulse-slow" />
       </div>
 
-      {/* Decorative Wand on right side */}
+      {/* Decorative Key on right side */}
       <div className="fixed right-8 top-1/2 -translate-y-1/2 hidden lg:block z-0 opacity-10">
-        <Wand size={200} className="text-purple-400 dark:text-purple-500 animate-pulse-slow" />
+        <KeyRound size={200} className="text-primary animate-pulse-slow" />
       </div>
 
       {/* Header/Hero section */}
@@ -44,7 +44,7 @@ const Index = () => {
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-center mb-6">
             <div className="flex items-center gap-2 text-primary">
-              <Gift size={28} className="animate-pulse-soft" />
+              <LockKeyhole size={28} className="animate-pulse-soft" />
               <span className="text-2xl font-semibold tracking-tight">EasyAccess</span>
             </div>
           </div>
