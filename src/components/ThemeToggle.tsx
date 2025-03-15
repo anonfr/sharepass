@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Sun, Moon, CircleDot } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const ThemeToggle = () => {
@@ -19,10 +19,8 @@ const ThemeToggle = () => {
         <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full">
           {theme === 'light' ? (
             <Sun className="h-4 w-4" />
-          ) : theme === 'dark' ? (
-            <Moon className="h-4 w-4" />
           ) : (
-            <CircleDot className="h-4 w-4" />
+            <Moon className="h-4 w-4" />
           )}
           <span className="sr-only">Toggle theme</span>
         </Button>
@@ -35,10 +33,6 @@ const ThemeToggle = () => {
         <DropdownMenuItem onClick={() => setTheme('dark')}>
           <Moon className="mr-2 h-4 w-4" />
           <span>Dark</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('amoled')}>
-          <CircleDot className="mr-2 h-4 w-4" />
-          <span>AMOLED</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

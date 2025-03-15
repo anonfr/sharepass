@@ -67,36 +67,6 @@
     --input: 210 40% 16%;
     --ring: 210 100% 60%;
   }
-  
-  .amoled {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
-
-    --card: 0 0% 2%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 2%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 210 100% 60%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 0 0% 6%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 0 0% 6%;
-    --muted-foreground: 0 0% 70%;
-
-    --accent: 0 0% 6%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 100% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 10%;
-    --input: 0 0% 10%;
-    --ring: 210 100% 60%;
-  }
 }
 
 @layer base {
