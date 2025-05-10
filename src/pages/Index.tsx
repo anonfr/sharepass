@@ -110,7 +110,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="w-full py-6 border-t z-10">
         <div className="max-w-6xl mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Created by Dhammanand Gaikwad</p>
+          <p>Created by Niyaz Khan, Kiran Nagre, Hariom Mane, Saurabh Khandare </p>
         </div>
       </footer>
     </div>
